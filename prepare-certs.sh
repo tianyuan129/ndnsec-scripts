@@ -3,45 +3,32 @@
 help()
 {
    echo ""
-   echo "Usage: $0 -p idPrefix -n idNum"
+   echo "Usage: $0 -p idPrefix -n idNum -s signer"
    echo "\t-p prefix of identities"
    echo "\t-n numbers of identities created under idPrefix"
+   echo "\t-s signing identity"
    echo "\t-d directory to write ndncert files"
-   echo "\t-D delete identities from keychain"
    echo "\t-h print this help message"
    exit 1
 }
 
-delete=0
-while getopts "p:n:d:D" opt
+while getopts "p:n:s:d:" opt
 do
    case "$opt" in
       p ) idPrefix="$OPTARG" ;;
       n ) idNum="$OPTARG" ;;
+      s ) signer="$OPTARG" ;;
       d ) dir="$OPTARG" ;;
-      D ) delete=1 ;;
       h ) help ;;
       ? ) help ;;
    esac
 done
 
-if [ $# -le 4 -a $delete -eq 0 ] 
+echo "signer $signer"
+
+if [ $# -le 3 ] 
 then 
     help
-    exit 1
-fi
-
-if [ $delete -eq 1 ]
-then
-    for i in `seq 1 $idNum`
-    do  
-        identity=$idPrefix$i
-        if ndnsec get-default -c -i $identity  &>/dev/null
-        then
-        echo "deleting $identity"
-        ndnsec delete $identity
-        fi
-    done
     exit 1
 fi
 
@@ -53,10 +40,10 @@ fi
 for i in `seq 1 $idNum`
 do  
     identity=$idPrefix$i
-    if ! ndnsec get-default -c -i $identity 2>/dev/null
+    if ndnsec get-default -c -i $identity 2>/dev/null
     then
-        echo "creating $identity"
-        ndnsec key-gen $identity | ndnsec cert-install -
+        echo "signing $identity with $signer"
+        ndnsec sign-req $identity | ndnsec cert-gen -s $signer -i anchor - | ndnsec cert-install -
+        ndnsec cert-dump -i $identity > $dir/signed-$i.ndncert
     fi
-    ndnsec cert-dump -i $identity > $dir/$i.ndncert
 done
