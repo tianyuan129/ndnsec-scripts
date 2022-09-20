@@ -3,7 +3,7 @@
 help()
 {
    echo ""
-   echo "Usage: $0 -p idPrefix -n idNum -s signer"
+   echo "Usage: $0 -p idPrefix -n idNum -s signer -d directory"
    echo "\t-p prefix of identities"
    echo "\t-n numbers of identities created under idPrefix"
    echo "\t-s signing identity"

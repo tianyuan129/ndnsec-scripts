@@ -3,7 +3,7 @@
 help()
 {
    echo ""
-   echo "Usage: $0 -p idPrefix -n idNum"
+   echo "Usage: $0 -p idPrefix -n idNum -d directory [-D]"
    echo "\t-p prefix of identities"
    echo "\t-n numbers of identities created under idPrefix"
    echo "\t-d directory to write ndncert files"
